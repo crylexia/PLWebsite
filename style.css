@@ -801,3 +801,36 @@ button:hover{
 .back-btn:hover{
     background:#f59e0b;
 }
+
+/* Modernizing the Input Fields */
+.form-box input[type="text"], 
+.form-box input[type="number"], 
+.form-box textarea {
+    width: 100%;
+    padding: 12px 15px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #d1d5db; /* Softer gray border */
+    border-radius: 10px;        /* Rounder corners */
+    font-size: 14px;
+    color: #1e293b;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    transition: all 0.3s ease; /* Smooth transition for the glow */
+}
+
+/* The "Glow" effect when clicking the field */
+.form-box input:focus, 
+.form-box textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); /* Soft blue halo */
+    background-color: #fff;
+}
+
+/* Making the placeholder text lighter */
+::placeholder {
+    color: #94a3b8;
+    font-style: italic;
+}
+

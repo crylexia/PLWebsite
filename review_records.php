@@ -90,10 +90,8 @@ $result = mysqli_query($conn, $sql);
 <body>
 
 <header>
-<div class="logo">LakbayLokal Marketplace</div>
-<nav>
-    <a href="dashboard.php">Dashboard</a>
-</nav>
+    <div class="logo">LakbayLokal Marketplace</div>
+    <nav><a href="dashboard.php">Dashboard</a></nav>
 </header>
 
 <div class="reviews-container">

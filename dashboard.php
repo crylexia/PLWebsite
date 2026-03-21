@@ -68,31 +68,7 @@ body{
     margin-top:0;
 }
 
-/* Header */
-header{
-    background:#102a43;
-    padding:15px 40px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
 
-.logo{
-    color:white;
-    font-weight:600;
-    font-size:18px;
-}
-
-nav a{
-    color:white;
-    text-decoration:none;
-    margin-left:20px;
-    font-weight:500;
-}
-
-nav a:hover{
-    color:#fbbf24;
-}
 </style>
 </head>
 

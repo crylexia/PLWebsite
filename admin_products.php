@@ -62,8 +62,8 @@ while($row = mysqli_fetch_assoc($result)){
 body{ background:#f1f5f9; }
 
 .admin-header{
-    background:#1e3a8a;
-    padding:20px 40px;
+    background:#102a43;
+    padding: 10px 40px;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -133,23 +133,39 @@ button{
 
 <body>
 
-<div class="admin-header">
-    <h1>LGU Product Manager</h1>
-    <a href="dashboard.php" class="back-btn"> Back to Dashboard</a>
-</div>
+<header>
+    <div class="logo">LakbayLokal Marketplace</div>
+    <nav><a href="dashboard.php">Dashboard</a></nav>
+</header>
 
 <div class="container">
 
     <!-- LEFT: FORM -->
     <div class="form-box">
-        <h3>Add Product</h3>
+    <h3 style="margin-bottom: 20px; color: #1e3a8a;">Add New Product</h3>
 
         <form method="POST" enctype="multipart/form-data">
-            <input type="text" name="name" placeholder="Product Name" required>
-            <textarea name="description" placeholder="Description" required></textarea>
-            <input type="number" name="price" step="0.01" placeholder="Price" required>
-            <input type="file" name="image" required>
-            <button type="submit" name="add_product">Add Product</button>
+            <div style="margin-bottom: 5px;">
+                <label style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Product Name</label>
+                <input type="text" name="name" placeholder="e.g. Fresh Strawberry Jam" required>
+            </div>
+
+            <div style="margin-bottom: 5px;">
+                <label style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Description</label>
+                <textarea name="description" placeholder="Describe the item..." required></textarea>
+            </div>
+
+            <div style="margin-bottom: 5px;">
+                <label style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Price (₱)</label>
+                <input type="number" name="price" step="0.01" placeholder="0.00" required>
+            </div>
+
+            <div style="margin-bottom: 5px;">
+                <label style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Product Image</label>
+                <input type="file" name="image" style="border:none; padding-left:0;" required>
+            </div>
+
+            <button type="submit" name="add_product" class="add-btn">Add Product</button>
         </form>
 
         <p class="success"><?= $msg ?></p>

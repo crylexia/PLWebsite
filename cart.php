@@ -6,22 +6,23 @@ if (!isset($_SESSION["user_id"])) {
 }
 
 include "db.php";
+$uid = $_SESSION["user_id"];
 
-$cart = $_SESSION["cart"] ?? [];
+// Fetch cart items from the DATABASE instead of just session
+$sql = "SELECT c.quantity, p.* FROM cart c 
+        JOIN products p ON c.product_id = p.id 
+        WHERE c.user_id = $uid";
+
+$result = mysqli_query($conn, $sql);
+
 $products = [];
 $total = 0;
 
-if (!empty($cart)) {
-    $ids = implode(",", array_keys($cart));
-    $sql = "SELECT * FROM products WHERE id IN ($ids)";
-    $result = mysqli_query($conn, $sql);
-
-    while ($row = mysqli_fetch_assoc($result)) {
-        $row["qty"] = $cart[$row["id"]];
-        $row["subtotal"] = $row["qty"] * $row["price"];
-        $total += $row["subtotal"];
-        $products[] = $row;
-    }
+while ($row = mysqli_fetch_assoc($result)) {
+    $row["qty"] = $row["quantity"];
+    $row["subtotal"] = $row["qty"] * $row["price"];
+    $total += $row["subtotal"];
+    $products[] = $row;
 }
 ?>
 <!DOCTYPE html>
@@ -88,14 +89,13 @@ if (!empty($cart)) {
 <body>
 
 <header>
-<div class="logo">LakbayLokal Marketplace</div>
-<nav>
-    <a href="dashboard.php">Dashboard</a>
-    <a href="products.php">Products</a>
-    <a href="cart.php">Cart (<?= array_sum($_SESSION["cart"] ?? []) ?>)</a>
-    <a href="orders.php">Orders</a>
-    <a href="logout.php">Logout</a>
-</nav>
+    <div class="logo">LakbayLokal Marketplace</div>
+    <nav>
+        <a href="dashboard.php">Dashboard</a>
+        <a href="products.php">Products</a>
+        <a href="orders.php">Orders</a>
+        <a href="reviews.php">Reviews</a>
+    </nav>
 </header>
 
 <div class="cart-container">

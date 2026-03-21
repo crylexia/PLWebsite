@@ -125,7 +125,17 @@ $h_stmt->close();
 <header>
     <div class="logo">LakbayLokal Marketplace</div>
     <nav>
-        <a href="dashboard.php">← Back to Dashboard</a>
+        <a href="dashboard.php">Dashboard</a>
+        <a href="products.php">Products</a>
+            <?php
+                // Fetch total quantity from the database
+                $uid = $_SESSION["user_id"];
+                $count_res = mysqli_query($conn, "SELECT SUM(quantity) as total_items FROM cart WHERE user_id = $uid");
+                $count_row = mysqli_fetch_assoc($count_res);
+                $cart_count = $count_row['total_items'] ?? 0;
+            ?>
+        <a href="cart.php">Cart (<?= $cart_count ?>)</a>
+        <a href="orders.php">Orders</a>
     </nav>
 </header>
 
