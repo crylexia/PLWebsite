@@ -22,6 +22,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $name = mysqli_real_escape_string($conn, $_POST["name"]);
     $desc = mysqli_real_escape_string($conn, $_POST["description"]);
     $price = $_POST["price"];
+    $category = mysqli_real_escape_string($conn, $_POST["category"]);
 
     if(!empty($_FILES["image"]["name"])){
 
@@ -30,18 +31,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         move_uploaded_file($tmp, "uploads/" . $imageName);
 
         $sql = "UPDATE products 
-                SET name='$name', description='$desc', price='$price', image='$imageName'
+                SET name='$name', description='$desc', price='$price', category='$category', image='$imageName'
                 WHERE id='$id'";
     } else {
 
         $sql = "UPDATE products 
-                SET name='$name', description='$desc', price='$price'
+                SET name='$name', description='$desc', price='$price', category='$category'
                 WHERE id='$id'";
     }
 
     mysqli_query($conn, $sql);
 
     header("Location: admin_products.php");
+    exit();
 }
 ?>
 
@@ -76,13 +78,14 @@ h2{
     color:#1e3a8a;
 }
 
-input, textarea{
+input, textarea, select{
     width:100%;
     padding:12px;
     margin-top:12px;
     border-radius:10px;
     border:1px solid #d1d5db;
     font-size:14px;
+    box-sizing:border-box;
 }
 
 textarea{
@@ -149,13 +152,23 @@ button:hover{
                value="<?= htmlspecialchars($product['name']) ?>"
                required>
 
-        <textarea name="description" required>
-<?= htmlspecialchars($product['description']) ?>
-        </textarea>
+        <textarea name="description" required><?= htmlspecialchars($product['description']) ?></textarea>
 
         <input type="number" name="price" step="0.01"
                value="<?= $product['price'] ?>"
                required>
+
+        <!-- CATEGORY FIELD -->
+        <select name="category" required>
+            <option value="Attire" <?= ($product['category'] == 'Attire') ? 'selected' : '' ?>>Attire</option>
+            <option value="Food Delicacy" <?= ($product['category'] == 'Food Delicacy') ? 'selected' : '' ?>>Food Delicacy</option>
+            <option value="Handicrafts" <?= ($product['category'] == 'Handicrafts') ? 'selected' : '' ?>>Handicrafts</option>
+            <option value="Souvenirs" <?= ($product['category'] == 'Souvenirs') ? 'selected' : '' ?>>Souvenirs</option>
+            <option value="Accessories" <?= ($product['category'] == 'Accessories') ? 'selected' : '' ?>>Accessories</option>
+            <option value="Home Decor" <?= ($product['category'] == 'Home Decor') ? 'selected' : '' ?>>Home Decor</option>
+            <option value="Local Art" <?= ($product['category'] == 'Local Art') ? 'selected' : '' ?>>Local Art</option>
+            <option value="General" <?= ($product['category'] == 'General') ? 'selected' : '' ?>>General</option>
+        </select>
 
         <div class="image-preview">
             <p><strong>Current Image</strong></p>

@@ -17,14 +17,15 @@ if(isset($_POST["add_product"])){
     $name = mysqli_real_escape_string($conn, $_POST["name"]);
     $desc = mysqli_real_escape_string($conn, $_POST["description"]);
     $price = $_POST["price"];
+    $category = mysqli_real_escape_string($conn, $_POST["category"]);
 
     $imageName = $_FILES["image"]["name"];
     $tmp = $_FILES["image"]["tmp_name"];
     $folder = "uploads/" . $imageName;
 
     if(move_uploaded_file($tmp, $folder)){
-        $sql = "INSERT INTO products (name, description, price, image)
-                VALUES ('$name','$desc','$price','$imageName')";
+        $sql = "INSERT INTO products (name, description, price, image, category)
+                VALUES ('$name','$desc','$price','$imageName','$category')";
         mysqli_query($conn,$sql);
         $msg = "Product added successfully!";
     } else {
@@ -85,12 +86,13 @@ body{ background:#f1f5f9; }
     box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-input, textarea{
+input, textarea, select{
     width:100%;
     padding:10px;
     margin-top:10px;
     border-radius:8px;
     border:1px solid #ccc;
+    box-sizing: border-box;
 }
 
 button{
@@ -108,12 +110,44 @@ button{
     flex:1;
 }
 
+.product-grid{
+    flex:1;
+    display:grid;
+    grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+    gap:25px;
+}
+
 .product-card{
     background:white;
     padding:15px;
     border-radius:12px;
     margin-bottom:15px;
     box-shadow:0 5px 15px rgba(0,0,0,0.08);
+    border-left:6px solid #f59e0b;
+}
+
+.product-card img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+    border-radius:12px;
+    margin-bottom:12px;
+}
+
+.product-card h3{
+    color:#102a43;
+    margin: 10px 0 8px;
+}
+
+.product-category{
+    display: inline-block;
+    background: #eff6ff;
+    color: #1e3a8a;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
 }
 
 .action-btn{
@@ -160,6 +194,22 @@ button{
                 <input type="number" name="price" step="0.01" placeholder="0.00" required>
             </div>
 
+            <!-- CATEGORY FIELD -->
+            <div style="margin-bottom: 5px;">
+                <label style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Category</label>
+                <select name="category" required>
+                    <option value="">Select Category</option>
+                    <option value="Attire">Attire</option>
+                    <option value="Food Delicacy">Food Delicacy</option>
+                    <option value="Handicrafts">Handicrafts</option>
+                    <option value="Souvenirs">Souvenirs</option>
+                    <option value="Accessories">Accessories</option>
+                    <option value="Home Decor">Home Decor</option>
+                    <option value="Local Art">Local Art</option>
+                    <option value="General">General</option>
+                </select>
+            </div>
+
             <div style="margin-bottom: 5px;">
                 <label style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Product Image</label>
                 <input type="file" name="image" style="border:none; padding-left:0;" required>
@@ -171,7 +221,7 @@ button{
         <p class="success"><?= $msg ?></p>
     </div>
 
-    <!-- PRODUCT GRID (same as products.php) -->
+    <!-- PRODUCT GRID -->
     <div class="product-grid">
 
     <?php foreach($products as $p): ?>
@@ -184,6 +234,9 @@ button{
 
             <img src="uploads/<?= htmlspecialchars($img) ?>" 
                 alt="<?= htmlspecialchars($p["name"]) ?>">
+
+            <!-- CATEGORY BADGE -->
+            <p class="product-category"><?= htmlspecialchars($p["category"]) ?></p>
 
             <h3><?= htmlspecialchars($p["name"]) ?></h3>
 

@@ -15,7 +15,7 @@ if($is_admin){
             JOIN users u ON o.user_id = u.id
             ORDER BY o.created_at DESC";
 } else {
-    $uid = $_SESSION["user_id"];
+    $uid = (int)$_SESSION["user_id"];
     $sql = "SELECT o.*, u.username 
             FROM orders o
             JOIN users u ON o.user_id = u.id
@@ -31,7 +31,7 @@ $result = mysqli_query($conn, $sql);
 <title>Orders | LakbayLokal</title>
 <link rel="stylesheet" href="style.css">
 <style>
-    .orders-container { padding: 40px; max-width: 1200px; margin: auto; }
+    .orders-container { padding: 40px; max-width: 1300px; margin: auto; }
     .orders-title { font-size: 28px; color: #102a43; margin-bottom: 20px; }
     
     .orders-table {
@@ -47,9 +47,14 @@ $result = mysqli_query($conn, $sql);
         padding: 16px;
         text-align: left;
         border-bottom: 1px solid #f0f4f8;
+        vertical-align: top;
     }
     
-    .orders-table th { background: #1e3a8a; color: white; font-weight: 600; }
+    .orders-table th { 
+        background: #1e3a8a; 
+        color: white; 
+        font-weight: 600; 
+    }
 
     .status {
         padding: 5px 12px;
@@ -57,9 +62,12 @@ $result = mysqli_query($conn, $sql);
         font-size: 12px;
         font-weight: bold;
         text-transform: uppercase;
+        display: inline-block;
     }
+
     .pending { background: #fef3c7; color: #92400e; }
     .approved { background: #dcfce7; color: #166534; }
+    .paid { background: #dcfce7; color: #166534; }
 
     .approve-btn {
         background: #16a34a;
@@ -67,14 +75,52 @@ $result = mysqli_query($conn, $sql);
         border: none;
         padding: 10px 16px;
         border-radius: 6px;
-
         cursor: pointer;
         transition: background 0.2s;
         font-size: 13px;
     }
+
     .approve-btn:hover { background: #15803d; }
     
-    .verified-text { color: #16a34a; font-weight: 600; font-size: 14px; }
+    .verified-text { 
+        color: #16a34a; 
+        font-weight: 600; 
+        font-size: 14px; 
+    }
+
+    .order-items {
+        min-width: 260px;
+    }
+
+    .item-row {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+    }
+
+    .item-name {
+        font-weight: 700;
+        color: #102a43;
+        margin-bottom: 4px;
+    }
+
+    .item-meta {
+        font-size: 13px;
+        color: #475569;
+    }
+
+    .empty-items {
+        color: #94a3b8;
+        font-style: italic;
+        font-size: 13px;
+    }
+
+    .order-total {
+        font-weight: 700;
+        color: #1e3a8a;
+    }
 </style>
 </head>
 <body>
@@ -88,7 +134,7 @@ $result = mysqli_query($conn, $sql);
             <a href="products.php">Products</a>
                 <?php
                 // Fetch total quantity from the database
-                $uid = $_SESSION["user_id"];
+                $uid = (int)$_SESSION["user_id"];
                 $count_res = mysqli_query($conn, "SELECT SUM(quantity) as total_items FROM cart WHERE user_id = $uid");
                 $count_row = mysqli_fetch_assoc($count_res);
                 $cart_count = $count_row['total_items'] ?? 0;
@@ -107,6 +153,7 @@ $result = mysqli_query($conn, $sql);
             <tr>
                 <th>Order ID</th>
                 <th>Customer</th>
+                <th>Items</th>
                 <th>Total</th>
                 <th>Status</th>
                 <th>Date</th>
@@ -120,12 +167,48 @@ $result = mysqli_query($conn, $sql);
             <tr>
                 <td>#<?= $row["id"] ?></td>
                 <td><?= htmlspecialchars($row["username"]) ?></td>
-                <td>₱<?= number_format($row["total"], 2) ?></td>
+
+                <!-- ORDER BREAKDOWN -->
+                <td class="order-items">
+                    <?php
+                    $order_id = (int)$row["id"];
+
+                    $items_sql = "SELECT oi.*, p.name 
+                                  FROM order_items oi
+                                  JOIN products p ON oi.product_id = p.id
+                                  WHERE oi.order_id = $order_id";
+
+                    $items_result = mysqli_query($conn, $items_sql);
+
+                    if(mysqli_num_rows($items_result) > 0):
+                        while($item = mysqli_fetch_assoc($items_result)):
+                            $subtotal = $item["price"] * $item["quantity"];
+                    ?>
+                        <div class="item-row">
+                            <div class="item-name"><?= htmlspecialchars($item["name"]) ?></div>
+                            <div class="item-meta">
+                                Qty: <?= $item["quantity"] ?> × ₱<?= number_format($item["price"], 2) ?>
+                            </div>
+                            <div class="item-meta">
+                                Subtotal: ₱<?= number_format($subtotal, 2) ?>
+                            </div>
+                        </div>
+                    <?php
+                        endwhile;
+                    else:
+                    ?>
+                        <span class="empty-items">No item breakdown found</span>
+                    <?php endif; ?>
+                </td>
+
+                <td class="order-total">₱<?= number_format($row["total"], 2) ?></td>
+
                 <td>
                     <span class="status <?= strtolower($row["status"]) ?>">
                         <?= $row["status"] ?>
                     </span>
                 </td>
+
                 <td><?= date("M d, Y", strtotime($row["created_at"])) ?></td>
 
                 <?php if($is_admin): ?>
