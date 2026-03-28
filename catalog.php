@@ -38,6 +38,18 @@ if ($result) {
     color:#102a43;
 }
 
+/* Category badge — matches product.php style */
+.product-category{
+    display: inline-block;
+    background: #eff6ff;
+    color: #1e3a8a;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+}
+
 .login-btn{
     margin-top:15px;
     display:block;
@@ -79,7 +91,10 @@ if ($result) {
 
         <img src="uploads/<?= htmlspecialchars($img) ?>" 
              alt="<?= htmlspecialchars($p["name"]) ?>" 
-             style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:15px;">
+             style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
+
+        <!-- Product Category -->
+        <p class="product-category"><?= htmlspecialchars($p["category"]) ?></p>
 
         <!-- Product Name -->
         <h3><?= htmlspecialchars($p["name"]) ?></h3>

@@ -44,10 +44,29 @@ if(isset($_GET["delete"])){
 }
 
 /* =========================
+   FETCH DISTINCT CATEGORIES
+========================= */
+$cat_result = mysqli_query($conn, "SELECT DISTINCT category FROM products ORDER BY category ASC");
+$categories = [];
+while ($row = mysqli_fetch_assoc($cat_result)) {
+    $categories[] = $row['category'];
+}
+
+/* Active filter — supports multiple categories */
+$selected_categories = isset($_GET['category']) ? (array)$_GET['category'] : [];
+
+/* Build category filter clause */
+$cat_filter = '';
+if (!empty($selected_categories)) {
+    $safe_cats = array_map(fn($c) => "'" . mysqli_real_escape_string($conn, $c) . "'", $selected_categories);
+    $cat_filter = "WHERE category IN (" . implode(',', $safe_cats) . ")";
+}
+
+/* =========================
    GET PRODUCTS
 ========================= */
 $products = [];
-$result = mysqli_query($conn, "SELECT * FROM products ORDER BY created_at DESC");
+$result = mysqli_query($conn, "SELECT * FROM products $cat_filter ORDER BY created_at DESC");
 while($row = mysqli_fetch_assoc($result)){
     $products[] = $row;
 }
@@ -83,6 +102,7 @@ body{ background:#f1f5f9; }
     padding:25px;
     border-radius:16px;
     width:350px;
+    flex-shrink: 0;
     box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
@@ -106,12 +126,98 @@ button{
     cursor:pointer;
 }
 
-.product-list{
-    flex:1;
+/* ── Filter Bar ── */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-bar > label {
+    font-weight: 700;
+    color: #102a43;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.category-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.checkbox-pill input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-pill span {
+    display: inline-block;
+    padding: 7px 16px;
+    border-radius: 999px;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.checkbox-pill span:hover {
+    border-color: #1e3a8a;
+    color: #1e3a8a;
+}
+
+.checkbox-pill input[type="checkbox"]:checked + span {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+    color: #fff;
+}
+
+.filter-btn {
+    padding: 8px 18px !important;
+    background: #1e3a8a !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    width: auto !important;
+    margin: 0 !important;
+    transition: background 0.2s !important;
+}
+
+.filter-btn:hover {
+    background: #102a43 !important;
+}
+
+.clear-btn {
+    padding: 8px 14px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.clear-btn:hover { background: #e2e8f0; }
+
+/* ── Product Grid ── */
+.product-list {
+    flex: 1;
+    min-width: 0;
 }
 
 .product-grid{
-    flex:1;
     display:grid;
     grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
     gap:25px;
@@ -121,7 +227,6 @@ button{
     background:white;
     padding:15px;
     border-radius:12px;
-    margin-bottom:15px;
     box-shadow:0 5px 15px rgba(0,0,0,0.08);
     border-left:6px solid #f59e0b;
 }
@@ -150,18 +255,13 @@ button{
     margin-bottom: 8px;
 }
 
-.action-btn{
-    display:inline-block;
-    padding:6px 10px;
-    border-radius:6px;
-    text-decoration:none;
-    font-size:13px;
-    margin-right:5px;
-}
+.success{ color:green; text-align:center; margin-top: 10px; }
 
-.edit{ background:#fbbf24; color:#1e3a8a; }
-.delete{ background:#dc2626; color:white; }
-.success{ color:green; text-align:center; }
+.no-results {
+    color: #64748b;
+    font-size: 15px;
+    padding: 20px 0;
+}
 </style>
 </head>
 
@@ -176,7 +276,7 @@ button{
 
     <!-- LEFT: FORM -->
     <div class="form-box">
-    <h3 style="margin-bottom: 20px; color: #1e3a8a;">Add New Product</h3>
+        <h3 style="margin-bottom: 20px; color: #1e3a8a;">Add New Product</h3>
 
         <form method="POST" enctype="multipart/form-data">
             <div style="margin-bottom: 5px;">
@@ -194,7 +294,6 @@ button{
                 <input type="number" name="price" step="0.01" placeholder="0.00" required>
             </div>
 
-            <!-- CATEGORY FIELD -->
             <div style="margin-bottom: 5px;">
                 <label style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Category</label>
                 <select name="category" required>
@@ -215,68 +314,73 @@ button{
                 <input type="file" name="image" style="border:none; padding-left:0;" required>
             </div>
 
-            <button type="submit" name="add_product" class="add-btn">Add Product</button>
+            <button type="submit" name="add_product">Add Product</button>
         </form>
 
         <p class="success"><?= $msg ?></p>
     </div>
 
-    <!-- PRODUCT GRID -->
-    <div class="product-grid">
+    <!-- RIGHT: FILTER + PRODUCT GRID -->
+    <div class="product-list">
 
-    <?php foreach($products as $p): ?>
+        <!-- ── Category Filter Bar ── -->
+        <form method="GET" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="filter-bar">
+            <label>Filter by Category:</label>
 
-        <div class="product-card">
+            <div class="category-checkboxes">
+                <?php foreach ($categories as $cat): ?>
+                    <label class="checkbox-pill">
+                        <input type="checkbox" name="category[]" value="<?= htmlspecialchars($cat) ?>"
+                            <?= in_array($cat, $selected_categories) ? 'checked' : '' ?>>
+                        <span><?= htmlspecialchars($cat) ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
 
-            <?php
-                $img = (!empty($p["image"])) ? $p["image"] : "placeholder.png";
-            ?>
+            <button type="submit" class="filter-btn">Apply</button>
 
-            <img src="uploads/<?= htmlspecialchars($img) ?>" 
-                alt="<?= htmlspecialchars($p["name"]) ?>">
+            <?php if (!empty($selected_categories)): ?>
+                <a href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="clear-btn">✕ Clear</a>
+            <?php endif; ?>
+        </form>
 
-            <!-- CATEGORY BADGE -->
-            <p class="product-category"><?= htmlspecialchars($p["category"]) ?></p>
+        <!-- ── Product Grid ── -->
+        <?php if (count($products) > 0): ?>
+            <div class="product-grid">
+            <?php foreach($products as $p): ?>
+                <div class="product-card">
+                    <?php $img = (!empty($p["image"])) ? $p["image"] : "placeholder.png"; ?>
 
-            <h3><?= htmlspecialchars($p["name"]) ?></h3>
+                    <img src="uploads/<?= htmlspecialchars($img) ?>"
+                        alt="<?= htmlspecialchars($p["name"]) ?>">
 
-            <p><?= htmlspecialchars($p["description"]) ?></p>
+                    <p class="product-category"><?= htmlspecialchars($p["category"]) ?></p>
 
-            <strong>₱<?= number_format($p["price"],2) ?></strong>
+                    <h3><?= htmlspecialchars($p["name"]) ?></h3>
+                    <p><?= htmlspecialchars($p["description"]) ?></p>
+                    <strong>₱<?= number_format($p["price"],2) ?></strong>
 
-            <!-- Admin Actions -->
-            <div style="margin-top:15px;">
-
-            <a href="edit_product.php?id=<?= $p["id"] ?>" 
-            style="display:inline-block;
-                    background:#fbbf24;
-                    color:#1e3a8a;
-                    padding:8px 14px;
-                    border-radius:6px;
-                    text-decoration:none;
-                    font-size:13px;
-                    font-weight:600;
-                    margin-right:8px;">
-                Edit
-            </a>
-
-            <a href="admin_products.php?delete=<?= $p["id"] ?>"
-            onclick="return confirm('Delete this product?');"
-            style="display:inline-block;
-                    background:#dc2626;
-                    color:white;
-                    padding:8px 14px;
-                    border-radius:6px;
-                    text-decoration:none;
-                    font-size:13px;
-                    font-weight:600;">
-                Delete
-            </a>
-
-        </div>
-        </div>
-
-    <?php endforeach; ?>
+                    <div style="margin-top:15px;">
+                        <a href="edit_product.php?id=<?= $p["id"] ?>"
+                            style="display:inline-block; background:#fbbf24; color:#1e3a8a;
+                                   padding:8px 14px; border-radius:6px; text-decoration:none;
+                                   font-size:13px; font-weight:600; margin-right:8px;">
+                            Edit
+                        </a>
+                        <a href="admin_products.php?delete=<?= $p["id"] ?>"
+                            onclick="return confirm('Delete this product?');"
+                            style="display:inline-block; background:#dc2626; color:white;
+                                   padding:8px 14px; border-radius:6px; text-decoration:none;
+                                   font-size:13px; font-weight:600;">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <p class="no-results">No products found for the selected category.</p>
+        <?php endif; ?>
 
     </div>
 </div>
