@@ -60,6 +60,92 @@ if ($result) {
     border-radius:8px;
     text-decoration:none;
 }
+
+/* FOOTER */
+        .site-footer {
+            background: #183153;
+            color: #f8fafc;
+            margin-top: 0;
+            border-top: 4px solid #f4b400;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px 20px 28px;
+        }
+
+        .footer-content h3 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 700;
+            color: #f4b400;
+        }
+
+        .footer-tagline {
+            margin: 14px auto 30px;
+            font-size: 17px;
+            line-height: 1.7;
+            color: #dbe4ef;
+            max-width: 680px;
+        }
+
+        .footer-contact {
+            margin-top: 10px;
+        }
+
+        .footer-contact h4 {
+            margin: 0 0 18px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+
+        .footer-contact p {
+            margin: 10px 0;
+            font-size: 17px;
+            line-height: 1.7;
+            color: #e5e7eb;
+        }
+
+        .footer-contact strong {
+            color: #f8fafc;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 16px 20px;
+        }
+
+        .footer-bottom p {
+            margin: 0;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+ 
+        @media (max-width: 768px) {
+            .footer-content h3 {
+                font-size: 24px;
+            }
+
+            .footer-tagline {
+                font-size: 15px;
+                margin-bottom: 24px;
+            }
+
+            .footer-contact h4 {
+                font-size: 20px;
+            }
+
+            .footer-contact p {
+                font-size: 15px;
+            }
+
+            .footer-bottom p {
+                font-size: 13px;
+            }
+        }
 </style>
 
 </head>
@@ -114,4 +200,16 @@ if ($result) {
 </div>
 
 </body>
+
+<footer class="site-footer">
+    <div class="footer-content">
+        <h3>LakbayLokal Marketplace</h3>
+        <p class="footer-tagline">Promoting local products, culture, and tourism in Lingayen, Pangasinan.</p>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2026 LakbayLokal Marketplace — Official LGU Local Products Marketplace</p>
+    </div>
+</footer>
+
 </html>
