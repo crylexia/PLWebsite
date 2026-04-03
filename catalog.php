@@ -19,6 +19,46 @@ if ($result) {
 <link rel="stylesheet" href="style.css">
 
 <style>
+/* ── Products Section Header ── */
+.products-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 40px 40px 12px;
+    flex-wrap: wrap;
+}
+
+.products-header-text h2 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 800;
+    color: #102a43;
+    line-height: 1.2;
+}
+
+.products-header-text p {
+    margin: 8px 0 0;
+    font-size: 15px;
+    color: #64748b;
+    max-width: 620px;
+    line-height: 1.6;
+}
+
+.products-header-meta {
+    display: flex;
+    align-items: center;
+}
+
+.products-count {
+    display: inline-block;
+    padding: 8px 14px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+}
 .product-grid{
     display:grid;
     grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
@@ -163,7 +203,16 @@ if ($result) {
 </nav>
 </header>
 
-<h2 style="padding:60px 60px 0;">Local Products</h2>
+<section class="products-header">
+    <div class="products-header-text">
+        <h2>Local Products</h2>
+        <p>Discover authentic Filipino delicacies, handmade goods, and proudly local favorites.</p>
+    </div>
+
+    <div class="products-header-meta">
+        <span class="products-count"><?= count($products) ?> Product<?= count($products) !== 1 ? 's' : '' ?></span>
+    </div>
+</section>
 
 <div class="product-grid">
 
@@ -204,11 +253,11 @@ if ($result) {
 <footer class="site-footer">
     <div class="footer-content">
         <h3>LakbayLokal Marketplace</h3>
-        <p class="footer-tagline">Promoting local products, culture, and tourism in Lingayen, Pangasinan.</p>
+        <p class="footer-tagline">Your online destination for authentic souvenir products from Lingayen, Pangasinan.</p>
     </div>
 
     <div class="footer-bottom">
-        <p>© 2026 LakbayLokal Marketplace — Official LGU Local Products Marketplace</p>
+        <p>© 2026 LakbayLokal Marketplace — Promoting Lingayen Souvenir Shops and Local Products</p>
     </div>
 </footer>
 

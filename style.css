@@ -221,14 +221,7 @@ nav a:hover::after {
 .split img:hover {
     transform: scale(1.05) rotate(-1deg);
 }
-.trust-item {
-    transition: 0.3s ease;
-}
 
-.trust-item:hover {
-    transform: translateY(-6px);
-    color: #1d4ed8;
-}
 .cta {
     position: relative;
     overflow: hidden;

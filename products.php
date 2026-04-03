@@ -55,6 +55,47 @@ if ($result) {
 <link rel="stylesheet" href="style.css">
 <style>
 
+/* ── Products Section Header ── */
+.products-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 40px 40px 12px;
+    flex-wrap: wrap;
+}
+
+.products-header-text h2 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 800;
+    color: #102a43;
+    line-height: 1.2;
+}
+
+.products-header-text p {
+    margin: 8px 0 0;
+    font-size: 15px;
+    color: #64748b;
+    max-width: 620px;
+    line-height: 1.6;
+}
+
+.products-header-meta {
+    display: flex;
+    align-items: center;
+}
+
+.products-count {
+    display: inline-block;
+    padding: 8px 14px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
 /* ── Filter Bar ── */
 .filter-bar {
     display: flex;
@@ -259,6 +300,71 @@ if ($result) {
     font-weight: 600;
     color: #102a43;
 }
+
+        /* FOOTER */
+        .site-footer {
+            background: #183153;
+            color: #f8fafc;
+            margin-top: 0;
+            border-top: 4px solid #f4b400;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px 20px 28px;
+        }
+
+        .footer-content h3 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 700;
+            color: #f4b400;
+        }
+
+        .footer-tagline {
+            margin: 14px auto 30px;
+            font-size: 17px;
+            line-height: 1.7;
+            color: #dbe4ef;
+            max-width: 680px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 16px 20px;
+        }
+
+        .footer-bottom p {
+            margin: 0;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+@media (max-width: 768px){
+.footer-content h3 {
+                font-size: 24px;
+            }
+
+            .footer-tagline {
+                font-size: 15px;
+                margin-bottom: 24px;
+            }
+
+            .footer-contact h4 {
+                font-size: 20px;
+            }
+
+            .footer-contact p {
+                font-size: 15px;
+            }
+
+            .footer-bottom p {
+                font-size: 13px;
+            }
+}
+
 </style>
 </head>
 
@@ -274,7 +380,16 @@ if ($result) {
     </nav>
 </header>
 
-<h2 style="padding:40px 40px 20px;">Local Products</h2>
+<section class="products-header">
+    <div class="products-header-text">
+        <h2>Local Products</h2>
+        <p>Discover authentic Filipino delicacies, handmade goods, and proudly local favorites.</p>
+    </div>
+
+    <div class="products-header-meta">
+        <span class="products-count"><?= count($products) ?> Product<?= count($products) !== 1 ? 's' : '' ?></span>
+    </div>
+</section>
 
 <!-- ── Category Filter Bar ── -->
 <form method="GET" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="filter-bar">
@@ -364,4 +479,14 @@ function changeQty(productId, change) {
 </script>
 
 </body>
+<footer class="site-footer">
+    <div class="footer-content">
+        <h3>LakbayLokal Marketplace</h3>
+        <p class="footer-tagline">Your online destination for authentic souvenir products from Lingayen, Pangasinan.</p>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2026 LakbayLokal Marketplace — Promoting Lingayen Souvenir Shops and Local Products</p>
+    </div>
+</footer>
 </html>

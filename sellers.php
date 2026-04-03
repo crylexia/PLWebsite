@@ -340,11 +340,11 @@
 <footer class="site-footer">
     <div class="footer-content">
         <h3>LakbayLokal Marketplace</h3>
-        <p class="footer-tagline">Promoting local products, culture, and tourism in Lingayen, Pangasinan.</p>
+        <p class="footer-tagline">Your online destination for authentic souvenir products from Lingayen, Pangasinan.</p>
     </div>
 
     <div class="footer-bottom">
-        <p>© 2026 LakbayLokal Marketplace — Official LGU Local Products Marketplace</p>
+        <p>© 2026 LakbayLokal Marketplace — Promoting Lingayen Souvenir Shops and Local Products</p>
     </div>
 </footer>
 
