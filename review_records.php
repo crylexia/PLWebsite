@@ -55,7 +55,7 @@ $result = mysqli_query($conn, $sql);
 
 .reviews-table th,
 .reviews-table td{
-    padding:15px;
+    padding:25px;
     text-align:left;
 }
 

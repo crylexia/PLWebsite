@@ -211,7 +211,7 @@ $result = mysqli_query($conn, $sql);
 </header>
 
 <div class="orders-container">
-    <h2 class="orders-title">📦 Orders Management</h2>
+    <h2 class="orders-title"> Orders Management</h2>
 
     <table class="orders-table">
         <thead>
@@ -228,68 +228,76 @@ $result = mysqli_query($conn, $sql);
             </tr>
         </thead>
         <tbody>
-            <?php while($row = mysqli_fetch_assoc($result)): ?>
-            <tr>
-                <td>#<?= $row["id"] ?></td>
-                <td><?= htmlspecialchars($row["username"]) ?></td>
+            <?php if ($result && mysqli_num_rows($result) > 0): ?>
+                <?php while($row = mysqli_fetch_assoc($result)): ?>
+                <tr>
+                    <td>#<?= $row["id"] ?></td>
+                    <td><?= htmlspecialchars($row["username"]) ?></td>
 
-                <!-- ORDER BREAKDOWN -->
-                <td class="order-items">
-                    <?php
-                    $order_id = (int)$row["id"];
+                    <!-- ORDER BREAKDOWN -->
+                    <td class="order-items">
+                        <?php
+                        $order_id = (int)$row["id"];
 
-                    $items_sql = "SELECT oi.*, p.name 
-                                  FROM order_items oi
-                                  JOIN products p ON oi.product_id = p.id
-                                  WHERE oi.order_id = $order_id";
+                        $items_sql = "SELECT oi.*, p.name 
+                                    FROM order_items oi
+                                    JOIN products p ON oi.product_id = p.id
+                                    WHERE oi.order_id = $order_id";
 
-                    $items_result = mysqli_query($conn, $items_sql);
+                        $items_result = mysqli_query($conn, $items_sql);
 
-                    if(mysqli_num_rows($items_result) > 0):
-                        while($item = mysqli_fetch_assoc($items_result)):
-                            $subtotal = $item["price"] * $item["quantity"];
-                    ?>
-                        <div class="item-row">
-                            <div class="item-name"><?= htmlspecialchars($item["name"]) ?></div>
-                            <div class="item-meta">
-                                Qty: <?= $item["quantity"] ?> × ₱<?= number_format($item["price"], 2) ?>
+                        if ($items_result && mysqli_num_rows($items_result) > 0):
+                            while($item = mysqli_fetch_assoc($items_result)):
+                                $subtotal = $item["price"] * $item["quantity"];
+                        ?>
+                            <div class="item-row">
+                                <div class="item-name"><?= htmlspecialchars($item["name"]) ?></div>
+                                <div class="item-meta">
+                                    Qty: <?= $item["quantity"] ?> × ₱<?= number_format($item["price"], 2) ?>
+                                </div>
+                                <div class="item-meta">
+                                    Subtotal: ₱<?= number_format($subtotal, 2) ?>
+                                </div>
                             </div>
-                            <div class="item-meta">
-                                Subtotal: ₱<?= number_format($subtotal, 2) ?>
-                            </div>
-                        </div>
-                    <?php
-                        endwhile;
-                    else:
-                    ?>
-                        <span class="empty-items">No item breakdown found</span>
+                        <?php
+                            endwhile;
+                        else:
+                        ?>
+                            <span class="empty-items">No item breakdown found</span>
+                        <?php endif; ?>
+                    </td>
+
+                    <td class="order-total">₱<?= number_format($row["total"], 2) ?></td>
+
+                    <td>
+                        <span class="status <?= strtolower($row["status"]) ?>">
+                            <?= $row["status"] ?>
+                        </span>
+                    </td>
+
+                    <td><?= date("M d, Y", strtotime($row["created_at"])) ?></td>
+
+                    <?php if($is_admin): ?>
+                    <td style="text-align: center;">
+                        <?php if($row["status"] == "Pending"): ?>
+                            <form method="post" action="approve_order.php" style="margin:0;">
+                                <input type="hidden" name="order_id" value="<?= $row["id"] ?>">
+                                <button type="submit" class="approve-btn">Mark as Paid</button>
+                            </form>
+                        <?php else: ?>
+                            <span class="verified-text">✔ Paid</span>
+                        <?php endif; ?>
+                    </td>
                     <?php endif; ?>
-                </td>
-
-                <td class="order-total">₱<?= number_format($row["total"], 2) ?></td>
-
-                <td>
-                    <span class="status <?= strtolower($row["status"]) ?>">
-                        <?= $row["status"] ?>
-                    </span>
-                </td>
-
-                <td><?= date("M d, Y", strtotime($row["created_at"])) ?></td>
-
-                <?php if($is_admin): ?>
-                <td style="text-align: center;">
-                    <?php if($row["status"] == "Pending"): ?>
-                        <form method="post" action="approve_order.php" style="margin:0;">
-                            <input type="hidden" name="order_id" value="<?= $row["id"] ?>">
-                            <button type="submit" class="approve-btn">Mark as Paid</button>
-                        </form>
-                    <?php else: ?>
-                        <span class="verified-text">✔ Paid</span>
-                    <?php endif; ?>
-                </td>
-                <?php endif; ?>
-            </tr>
-            <?php endwhile; ?>
+                </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="<?= $is_admin ? 7 : 6 ?>" style="text-align:center; padding: 80px; color:#64748b; font-weight:600;">
+                        No orders found.
+                    </td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 </div>

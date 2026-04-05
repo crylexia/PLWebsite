@@ -836,3 +836,11 @@ button:hover{
     font-size: 14px;
     background: #fff;
 }
+
+.empty-row {
+    text-align: center;
+    padding: 36px !important;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 15px;
+}

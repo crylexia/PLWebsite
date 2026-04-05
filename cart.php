@@ -78,7 +78,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 .empty-cart{
     background:white;
-    padding:50px;
+    padding:70px;
     text-align:center;
     border-radius:16px;
     box-shadow:0 10px 25px rgba(0,0,0,0.1);
@@ -165,7 +165,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <div class="cart-container">
 
-<h2 class="cart-title">🛒 Your Shopping Cart</h2>
+<h2 class="cart-title"> Your Shopping Cart</h2>
 
 <?php if(empty($products)): ?>
     <div class="empty-cart">

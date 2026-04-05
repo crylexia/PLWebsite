@@ -7,13 +7,6 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background: #f8fafc;
-        }
-
         /* HERO */
         .hero {
             background: linear-gradient(to right, #0f172a, #1e3a8a);
@@ -396,7 +389,7 @@
 <body>
 
 <header>
-    <div class="logo">LakbayLokal</div>
+    <div class="logo">LakbayLokal Marketplace</div>
     <nav>
         <a href="index.php">Home</a>
         <a href="catalog.php">Products</a>

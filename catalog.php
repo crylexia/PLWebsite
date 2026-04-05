@@ -193,7 +193,7 @@ if ($result) {
 <body>
 
 <header>
-<div class="logo">LakbayLokal</div>
+<div class="logo">LakbayLokal Marketplace</div>
 <nav>
     <a href="index.php">Home</a>
     <a href="catalog.php">Products</a>
