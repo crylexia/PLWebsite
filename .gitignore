@@ -1,0 +1,19 @@
+# Environment — contains secrets, never commit
+.env
+
+# Composer-managed dependencies — install at deploy time
+vendor/
+
+# Uploaded product images
+assets/css/uploads/*.jpg
+assets/css/uploads/*.jpeg
+assets/css/uploads/*.png
+assets/css/uploads/*.webp
+assets/css/uploads/*.gif
+# Keep the placeholder and .htaccess guard
+!assets/css/uploads/placeholder.png
+!assets/css/uploads/.htaccess
+
+# Logs
+*.log
+error_log
