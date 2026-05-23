@@ -6,11 +6,11 @@ $dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->safeLoad();
 
 $conn = new mysqli(
-    $_ENV['DB_HOST'] ?? 'localhost',
+    $_ENV['DB_HOST'] ?? 'kodama.proxy.rlwy.net',
     $_ENV['DB_USER'] ?? 'root',
-    $_ENV['DB_PASS'] ?? '',
+    $_ENV['DB_PASS'] ?? 'kKEGceStAsqwWatuEVzsaWMgaxkzIuJu',
     $_ENV['DB_NAME'] ?? 'railway',
-    (int)($_ENV['DB_PORT'] ?? 3306)
+    (int)($_ENV['DB_PORT'] ?? 47100)
 );
 
 if ($conn->connect_error) {
