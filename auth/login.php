@@ -125,6 +125,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </a>
     </p>
     
+    <p style="font-size:14px; margin-top:10px;">
+        <a href="forgot.php" style="color:#1e3a8a;">Forgot Password?</a>
+        &nbsp;|&nbsp;
+        <a href="show_username.php" style="color:#1e3a8a;">Find Username</a>
+    </p>
+
     <p class="back-home">
         <a href="../index.php">← Back to Home</a>
     </p>
