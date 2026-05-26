@@ -665,8 +665,7 @@ $h_stmt->close();
         <?php while($h_row = $history_result->fetch_assoc()): ?>
             <div class="review-card">
                 <div class="review-image">
-                    <img src="<?= htmlspecialchars($row['image']); ?>" alt="<?= htmlspecialchars($row['name']); ?>">
-                </div>
+                    <img src="<?= htmlspecialchars($h_row['image']); ?>" alt="<?= htmlspecialchars($h_row['name']); ?>">
 
                 <div class="review-content">
                     <span class="product-name"><?php echo htmlspecialchars($h_row['name']); ?></span>
