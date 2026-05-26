@@ -24,6 +24,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verify hashed password
         if (password_verify($password, $row["password"])) {
 
+            session_regenerate_id(true);
+
             // Save login session
             $_SESSION["user_id"] = $row["id"];
             $_SESSION["role"] = $row["role"];

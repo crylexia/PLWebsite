@@ -10,11 +10,14 @@ include "../config/csrf.php";
 $uid = $_SESSION["user_id"];
 
 // Fetch cart items from the DATABASE instead of just session
-$sql = "SELECT c.quantity, p.* FROM cart c 
-        JOIN products p ON c.product_id = p.id 
-        WHERE c.user_id = $uid";
-
-$result = mysqli_query($conn, $sql);
+$stmt = $conn->prepare(
+    "SELECT c.quantity, p.* FROM cart c
+     JOIN products p ON c.product_id = p.id
+     WHERE c.user_id = ?"
+);
+$stmt->bind_param("i", $uid);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $products = [];
 $total = 0;
@@ -249,7 +252,7 @@ table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 <?php foreach($products as $p): ?>
 <tr>
-    <td><?= $p["name"] ?></td>
+    <td><?= htmlspecialchars($p["name"], ENT_QUOTES, 'UTF-8') ?></td>
     <td>₱<?= number_format($p["price"],2) ?></td>
     <td><?= $p["qty"] ?></td>
     <td>₱<?= number_format($p["subtotal"],2) ?></td>

@@ -42,6 +42,7 @@ LakbayLokal connects customers to local souvenir shops in Lingayen — browse, o
 | Passwords | PHP `password_hash()` / `password_verify()` (bcrypt) |
 | CSRF | Custom token helpers in `config/csrf.php` |
 | Sessions | PHP native sessions |
+| Testing | PHPUnit 11.x |
 | Deployment | Docker (php:8.2-apache) + Railway (MySQL) |
 
 ---
@@ -145,6 +146,44 @@ http://localhost:8080/
 
 ---
 
+## Running Tests
+
+The project includes a PHPUnit test suite covering all major features. Tests run against a separate `railway_test` database so your real data is never touched.
+
+### Setup
+
+**1. Create the test database**
+
+Open phpMyAdmin, create a new database called `railway_test`, then run the same **Database Schema** SQL below on it.
+
+**2. Install dev dependencies** (if not already done)
+```bash
+composer install
+```
+
+**3. Run the tests**
+```bash
+./vendor/bin/phpunit
+```
+
+Expected output:
+```
+OK (30 tests, 45 assertions)
+```
+
+### Test Coverage
+
+| File | What it tests |
+|---|---|
+| `tests/CartTest.php` | Cart prepared statement, stock deduction, oversell blocked, order insert, cart clear after checkout |
+| `tests/AuthTest.php` | Password verify, wrong password rejected, duplicate username/email blocked, default role |
+| `tests/ProductTest.php` | Product insert, update, delete, restock, stock cannot go negative |
+| `tests/OrderTest.php` | Default Pending status, total stored correctly, admin approval, audit trail recorded, no re-approval |
+| `tests/ReviewTest.php` | Review insert, duplicate blocked by UNIQUE constraint, rating range 1–5, update, delete |
+| `tests/FavoriteTest.php` | Favorite add, remove, duplicate blocked, toggle add, toggle remove |
+
+---
+
 ## Database Schema
 
 Run the following SQL in phpMyAdmin or your MySQL client:
@@ -243,7 +282,8 @@ FR_OUT/
 ├── index.php               # Landing page (public)
 ├── .env                    # Secrets — gitignored, never commit
 ├── .env.example            # Committed template showing required keys
-├── composer.json           # Composer dependencies
+├── composer.json           # Composer dependencies (phpmailer, phpdotenv, phpunit)
+├── phpunit.xml             # PHPUnit configuration
 ├── Dockerfile              # PHP 8.2 Apache container
 ├── config/
 │   ├── db.php              # MySQLi connection — reads all values from .env
@@ -253,6 +293,14 @@ FR_OUT/
 ├── admin/                  # Product CRUD, restock, order approval, review records
 ├── user/                   # Catalog, products, cart, checkout, orders, favorites, tourism
 ├── reviews/                # Review submit/edit/delete and admin records view
+├── tests/
+│   ├── TestCase.php        # Base test class with MySQLi connection setup
+│   ├── CartTest.php        # Cart and checkout tests
+│   ├── AuthTest.php        # Authentication and registration tests
+│   ├── ProductTest.php     # Product CRUD and stock tests
+│   ├── OrderTest.php       # Order flow and approval tests
+│   ├── ReviewTest.php      # Review CRUD and constraint tests
+│   └── FavoriteTest.php    # Favorites toggle and duplicate tests
 ├── assets/css/
 │   ├── style.css           # Global styles (1 070 lines)
 │   ├── images/             # Static landmark photos
@@ -295,6 +343,7 @@ All major attack surfaces are addressed in this release:
 - **OTP security** — codes are emailed only (never shown on screen), expire after 10–15 minutes, and lock out after 5 wrong attempts. Resend is rate-limited to 30 seconds per session.
 - **Error exposure** — no `die()` calls remain; all errors redirect cleanly or write to the PHP error log only.
 - **Credentials** — all secrets live in `.env` (gitignored); a `.env.example` template is committed instead.
+- **Transactional checkout** — stock check uses `FOR UPDATE` row lock inside a database transaction, preventing overselling under concurrent load.
 
 ---
 
@@ -318,6 +367,7 @@ For local development, point `.env` at `localhost` / port `3306` to avoid the la
 - Map tiles via [OpenStreetMap](https://www.openstreetmap.org/) through [Leaflet.js](https://leafletjs.com/).
 - Email delivery via [PHPMailer](https://github.com/PHPMailer/PHPMailer).
 - Environment config via [vlucas/phpdotenv](https://github.com/vlucas/phpdotenv).
+- Automated testing via [PHPUnit](https://phpunit.de/).
 
 ---
 

@@ -324,7 +324,7 @@ unset($_SESSION['order_success'], $_SESSION['cart_error']);
             <?php if ($result && mysqli_num_rows($result) > 0): ?>
                 <?php while($row = mysqli_fetch_assoc($result)): ?>
                 <tr>
-                    <td>#<?= $row["id"] ?></td>
+                    <td>#<?= (int)$row["id"] ?></td>
                     <td><?= htmlspecialchars($row["username"]) ?></td>
 
                     <!-- ORDER BREAKDOWN -->
@@ -363,8 +363,8 @@ unset($_SESSION['order_success'], $_SESSION['cart_error']);
                     <td class="order-total">₱<?= number_format($row["total"], 2) ?></td>
 
                     <td>
-                        <span class="status <?= strtolower($row["status"]) ?>">
-                            <?= $row["status"] ?>
+                        <span class="status <?= htmlspecialchars(strtolower($row["status"]), ENT_QUOTES, 'UTF-8') ?>">
+                            <?= htmlspecialchars($row["status"], ENT_QUOTES, 'UTF-8') ?>
                         </span>
                     </td>
 
@@ -375,7 +375,7 @@ unset($_SESSION['order_success'], $_SESSION['cart_error']);
                         <?php if($row["status"] == "Pending"): ?>
                             <form method="post" action="../admin/approve_order.php" style="margin:0;">
                                 <?= csrf_field() ?>
-                                <input type="hidden" name="order_id" value="<?= $row["id"] ?>">
+                                <input type="hidden" name="order_id" value="<?= (int)$row["id"] ?>">
                                 <button type="submit" class="approve-btn">Mark as Paid</button>
                             </form>
                         <?php else: ?>

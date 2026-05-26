@@ -3,6 +3,7 @@
 **Project Name:** LakbayLokal — LGU Local Products Marketplace  
 **Database:** `railway` (MySQL via MySQLi — Railway cloud for production, localhost for development)  
 **Stack:** PHP 8.2 (procedural), MySQL, HTML/CSS (vanilla), JavaScript (vanilla), PHPMailer, vlucas/phpdotenv  
+**Testing:** PHPUnit 11.x — 30 tests, 45 assertions across 6 test files  
 **Deployment:** Docker (PHP 8.2 Apache image) + Railway cloud database  
 **Theme:** Lingayen, Pangasinan souvenir and tourism e-commerce platform
 
@@ -21,9 +22,13 @@
 | `verify_register.php` | No CSRF on OTP form | CSRF added to include and form |
 | `orders.php` approve form | Missing `csrf_field()` | Token field added |
 | `products.php` forms | Missing `csrf_field()` on both forms | Token field added to favorite and cart forms |
+| `cart.php` | Raw interpolated query (`$uid` directly in SQL) | Prepared statement with bound parameter |
+| `orders.php` output | Unescaped `$row["id"]` and `$row["status"]` | All outputs wrapped with `htmlspecialchars()` / cast to `(int)` |
+| `checkout.php` stock check | Three separate queries, no transaction | Wrapped in `begin_transaction()` with `FOR UPDATE` row lock |
 | DB credentials | Hardcoded in `db.php` | Read from `.env` via `$_ENV` |
 | `.env` in source | Live credentials committed | Credentials scrubbed; `.env.example` added; `.env` gitignored |
 | `die()` calls | Present in restock and delete | Zero `die()` calls remain anywhere |
+| Test suite | Not implemented | 30 PHPUnit tests across 6 files covering cart, auth, products, orders, reviews, and favorites |
 
 ---
 
@@ -34,7 +39,8 @@ FR_OUT/
 ├── index.php                        # Public landing / home page
 ├── .env                             # Secrets — never commit (gitignored)
 ├── .env.example                     # Committed template showing required keys
-├── composer.json                    # Requires phpmailer + phpdotenv
+├── composer.json                    # Requires phpmailer + phpdotenv + phpunit (dev)
+├── phpunit.xml                      # PHPUnit configuration
 ├── Dockerfile                       # PHP 8.2-apache, installs mysqli/pdo/zip, runs composer
 ├── config/
 │   ├── db.php                       # MySQLi connection — reads all credentials from .env
@@ -61,15 +67,23 @@ FR_OUT/
 │   ├── catalog.php                  # Public product listing (no auth required)
 │   ├── products.php                 # Auth-gated listing with favorites + category filter
 │   ├── add_to_cart.php              # Cart insert, stock guard, CSRF (no-rotate)
-│   ├── cart.php                     # DB-backed cart view + CSRF field on checkout form
-│   ├── checkout.php                 # Order creation + stock deduction + cart clear + CSRF
-│   ├── orders.php                   # Orders list (role-aware) + CSRF field on approve form
+│   ├── cart.php                     # DB-backed cart view + prepared statement + CSRF field
+│   ├── checkout.php                 # Transactional order creation + FOR UPDATE stock lock
+│   ├── orders.php                   # Orders list (role-aware) + htmlspecialchars on output
 │   ├── add_to_favorite.php          # Favorites toggle + CSRF (no-rotate) + safe redirect
 │   ├── toggle_favorite.php          # Favorites toggle (catalog) + CSRF (no-rotate)
 │   └── tourism.php                  # Tourism areas with Leaflet.js interactive map
 ├── reviews/
 │   ├── reviews.php                  # Review submit / edit / delete + CSRF
 │   └── review_records.php           # Admin view of all reviews
+├── tests/
+│   ├── TestCase.php                 # Base class — MySQLi connection to railway_test
+│   ├── CartTest.php                 # Cart prepared statement, stock deduction, oversell, order insert, cart clear
+│   ├── AuthTest.php                 # Password verify, wrong password, duplicate username/email, default role
+│   ├── ProductTest.php              # Product insert, update, delete, restock, stock limit
+│   ├── OrderTest.php                # Default status, total, admin approval, audit trail, no re-approval
+│   ├── ReviewTest.php               # Review insert, duplicate blocked, rating range, update, delete
+│   └── FavoriteTest.php             # Favorite add, remove, duplicate blocked, toggle add/remove
 ├── assets/css/
 │   ├── style.css                    # Global stylesheet (1 070 lines)
 │   ├── images/pictures/             # Static landmark images
@@ -200,7 +214,10 @@ Dual-mode tab UI — "Forgot Username" or "Forgot Password":
 | Account recovery queries | ✅ Prepared statements |
 | Admin product CRUD | ✅ Prepared statements |
 | Review CRUD | ✅ Prepared statements |
+| Cart query | ✅ Prepared statement (SQL injection fix) |
 | Cart / favorites | ✅ Prepared statements |
+| Orders output | ✅ htmlspecialchars on all echoed DB values (XSS fix) |
+| Checkout stock check | ✅ Transactional with FOR UPDATE row lock (race condition fix) |
 | Image upload validation | ✅ MIME type + extension whitelist (jpg/png/webp) via `finfo` |
 | Stock re-validated at checkout | ✅ Server-side before order creation |
 | Order audit trail | ✅ `order_audit` table |
@@ -210,20 +227,45 @@ Dual-mode tab UI — "Forgot Username" or "Forgot Password":
 | DB credentials in source | ✅ Fully in `.env`, read via `$_ENV` |
 | `.env` in version control | ✅ Gitignored; `.env.example` committed instead |
 | `vendor/` in version control | ✅ Gitignored; installed by Dockerfile at deploy time |
+| Automated test suite | ✅ 30 PHPUnit tests, 45 assertions, 6 test files |
+| Session fixation prevention | ✅ `session_regenerate_id(true)` on login |
 
 ---
 
-## 7. Shopping & Order Flow
+## 7. Test Suite
 
-- **Cart**: DB-backed (`cart` table), persistent across sessions.
+Tests run against a separate `railway_test` database — the production `railway` database is never touched.
+
+**Run:**
+```bash
+./vendor/bin/phpunit
+```
+
+**Coverage:**
+
+| File | Tests | What it covers |
+|---|---|---|
+| `CartTest.php` | 5 | Prepared statement, stock deduction, oversell blocked, order insert, cart clear |
+| `AuthTest.php` | 5 | Password verify, wrong password, duplicate username/email, default role |
+| `ProductTest.php` | 5 | Insert, update, delete, restock, stock cannot go negative |
+| `OrderTest.php` | 5 | Default status, total, admin approval, audit trail, no re-approval |
+| `ReviewTest.php` | 5 | Insert, duplicate blocked, rating range 1–5, update, delete |
+| `FavoriteTest.php` | 5 | Add, remove, duplicate blocked, toggle add, toggle remove |
+| **Total** | **30** | **45 assertions** |
+
+---
+
+## 8. Shopping & Order Flow
+
+- **Cart**: DB-backed (`cart` table), persistent across sessions. Cart query uses prepared statement.
 - **Add to cart**: stock checked before insert; quantity capped at available stock; CSRF protected.
-- **Checkout**: stock re-validated server-side → order INSERT → `order_items` INSERT + stock decrement → cart DELETE.
-- **Orders**: role-aware (buyers see own; admins see all with username JOIN).
+- **Checkout**: wrapped in a database transaction. Stock re-validated with `FOR UPDATE` row lock → order INSERT → `order_items` INSERT + stock decrement → cart DELETE → `commit()`. Any failure triggers `rollback()`.
+- **Orders**: role-aware (buyers see own; admins see all with username JOIN). All output escaped with `htmlspecialchars()`.
 - **Approval**: admin POSTs to `approve_order.php` (CSRF verified); sets `status = 'Approved'`; writes to `order_audit`.
 
 ---
 
-## 8. Deployment
+## 9. Deployment
 
 ### Local Development (XAMPP)
 Create a local `railway` database in phpMyAdmin, import your schema/data, and set `.env` to:
@@ -251,9 +293,7 @@ Set Railway environment variables to the production DB and SMTP credentials. The
 
 ---
 
-## 9. Remaining Recommendations
+## 10. Remaining Recommendations
 
 - **Rotate credentials**: the Railway DB password and Gmail App Password were present in an earlier zip. Both should be regenerated before any public deployment.
-- **Post-login redirect**: currently sends all users to `admin/dashboard.php`; a neutral `/dashboard.php` would improve buyer UX.
 - **HTTPS**: enforce TLS in production (Railway provides this automatically on custom domains).
-- **Session hardening**: consider `session_regenerate_id(true)` on login to prevent session fixation.

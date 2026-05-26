@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ? "retrieve your username"
             : "reset your password";
 
-        $subject = "LakbayLokal – {$label} Code";
+        $subject = "LakbayLokal - {$label} Code";
         $body = "
             <div style='font-family:sans-serif; max-width:480px; margin:auto;'>
                 <div style='background:#102a43; padding:24px; border-radius:12px 12px 0 0; text-align:center;'>
