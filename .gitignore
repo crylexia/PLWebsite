@@ -2,7 +2,6 @@
 .env
 
 # Config files — contain credentials, never commit
-config/cloudinary.php
 config/db.php
 config/mailer.php
 # csrf.php is likely safe to commit (no secrets), leave it out
