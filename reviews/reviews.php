@@ -666,7 +666,7 @@ $h_stmt->close();
             <div class="review-card">
                 <div class="review-image">
                     <img src="<?= htmlspecialchars($h_row['image']); ?>" alt="<?= htmlspecialchars($h_row['name']); ?>">
-
+                </div>
                 <div class="review-content">
                     <span class="product-name"><?php echo htmlspecialchars($h_row['name']); ?></span>
 
