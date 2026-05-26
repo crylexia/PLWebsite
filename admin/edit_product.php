@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $safeBase  = preg_replace('/[^a-zA-Z0-9_-]/', '_', pathinfo($origName, PATHINFO_FILENAME));
             $publicId  = time() . '_' . $safeBase;
 
-            include_once "../config/cloudinary.php";
+            include_once(__DIR__ . '/../config/cloudinary.php');
             $imageUrl = uploadToCloudinary($tmp, $publicId);
 
             if (!$imageUrl) {
