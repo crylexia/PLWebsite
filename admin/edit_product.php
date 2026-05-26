@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $stmt = $conn->prepare(
                     "UPDATE products SET name=?, description=?, price=?, category=?, image=? WHERE id=?"
                 );
-                $stmt->bind_param("ssdssl", $name, $desc, $price, $category, $imageUrl, $id);
+                $stmt->bind_param("ssdsi", $name, $desc, $price, $category, $imageUrl, $id);
                 $stmt->execute();
                 $stmt->close();
 
