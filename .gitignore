@@ -1,6 +1,12 @@
 # Environment — contains secrets, never commit
 .env
 
+# Config files — contain credentials, never commit
+config/cloudinary.php
+config/db.php
+config/mailer.php
+# csrf.php is likely safe to commit (no secrets), leave it out
+
 # Composer-managed dependencies — install at deploy time
 vendor/
 
@@ -14,6 +20,19 @@ assets/css/uploads/*.gif
 !assets/css/uploads/placeholder.png
 !assets/css/uploads/.htaccess
 
+# PHPUnit cache
+.phpunit.result.cache
+
 # Logs
 *.log
 error_log
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE/editor folders
+.vscode/
+.idea/
+*.code-workspace
