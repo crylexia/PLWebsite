@@ -1,9 +1,4 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require dirname(__DIR__) . '/vendor/autoload.php';
-
 function sendMail($to, $subject, $body)
 {
     if (session_status() === PHP_SESSION_NONE) {
@@ -17,25 +12,33 @@ function sendMail($to, $subject, $body)
         }
     }
     $_SESSION["last_otp_sent"] = time();
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host       = $_ENV['MAIL_HOST'];
-        $mail->SMTPAuth   = true;
-        $mail->Username   = $_ENV['MAIL_USERNAME'];
-        $mail->Password   = $_ENV['MAIL_PASSWORD'];
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = $_ENV['MAIL_PORT'];
-        $mail->setFrom($_ENV['MAIL_FROM'], $_ENV['MAIL_FROM_NAME']);
-        $mail->addAddress($to);
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body    = $body;
-        $mail->AltBody = strip_tags($body);
-        $mail->send();
+
+    $apiKey = $_ENV['BREVO_API_KEY'];
+    $payload = json_encode([
+        "sender"     => ["name" => $_ENV['MAIL_FROM_NAME'], "email" => $_ENV['MAIL_FROM']],
+        "to"         => [["email" => $to]],
+        "subject"    => $subject,
+        "htmlContent"=> $body
+    ]);
+
+    $ch = curl_init("https://api.brevo.com/v3/smtp/email");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "accept: application/json",
+        "api-key: $apiKey",
+        "content-type: application/json"
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 201) {
         return true;
-    } catch (Exception $e) {
-        error_log("Mailer Error: " . $mail->ErrorInfo);
-        return "Mailer Error: " . $mail->ErrorInfo;
+    } else {
+        error_log("Brevo Error: " . $response);
+        return "Mailer Error: " . $response;
     }
 }
