@@ -287,7 +287,7 @@ if ($result) {
             $img = !empty($p["image"]) ? $p["image"] : "placeholder.png";
         ?>
 
-        <img src="../assets/css/uploads/<?= htmlspecialchars($img) ?>" 
+        <img src="<?= htmlspecialchars($p['image']) ?>" 
              alt="<?= htmlspecialchars($p["name"]) ?>" 
              style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
 

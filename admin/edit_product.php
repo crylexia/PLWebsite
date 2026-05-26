@@ -54,18 +54,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $uploadError = "Invalid image type. Only JPG, PNG, and WebP are allowed.";
         } else {
             $safeBase  = preg_replace('/[^a-zA-Z0-9_-]/', '_', pathinfo($origName, PATHINFO_FILENAME));
-            $imageName = time() . '_' . $safeBase . '.' . $ext;
-            move_uploaded_file($tmp, "../assets/css/uploads/" . $imageName);
+            $publicId  = time() . '_' . $safeBase;
 
-            $stmt = $conn->prepare(
-                "UPDATE products SET name=?, description=?, price=?, category=?, image=? WHERE id=?"
-            );
-            $stmt->bind_param("ssdssi", $name, $desc, $price, $category, $imageName, $id);
-            $stmt->execute();
-            $stmt->close();
+            include_once "../config/cloudinary.php";
+            $imageUrl = uploadToCloudinary($tmp, $publicId);
 
-            header("Location: admin_products.php");
-            exit();
+            if (!$imageUrl) {
+                $uploadError = "Image upload failed. Check Cloudinary credentials.";
+            } else {
+                $stmt = $conn->prepare(
+                    "UPDATE products SET name=?, description=?, price=?, category=?, image=? WHERE id=?"
+                );
+                $stmt->bind_param("ssdssl", $name, $desc, $price, $category, $imageUrl, $id);
+                $stmt->execute();
+                $stmt->close();
+
+                header("Location: admin_products.php");
+                exit();
+            }
         }
 
     } else {
@@ -213,7 +219,7 @@ button:hover{
 
         <div class="image-preview">
             <p><strong>Current Image</strong></p>
-            <img src="../assets/css/uploads/<?= htmlspecialchars($product['image']) ?>">
+            <img src="<?= htmlspecialchars($product['image']) ?>">
         </div>
 
         <input type="file" name="image">

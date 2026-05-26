@@ -624,7 +624,7 @@ $h_stmt->close();
             <?php while($row = $pending_result->fetch_assoc()): ?>
                 <div class="review-card">
                     <div class="review-image">
-                        <img src="../assets/css/uploads/<?php echo htmlspecialchars($row['image']); ?>" alt="<?php echo htmlspecialchars($row['name']); ?>">
+                        <img src="<?= htmlspecialchars($row['image']); ?>" alt="<?= htmlspecialchars($row['name']); ?>">
                     </div>
 
                     <div class="review-content">
@@ -665,7 +665,7 @@ $h_stmt->close();
         <?php while($h_row = $history_result->fetch_assoc()): ?>
             <div class="review-card">
                 <div class="review-image">
-                    <img src="../assets/css/uploads/<?php echo htmlspecialchars($h_row['image']); ?>" alt="<?php echo htmlspecialchars($h_row['name']); ?>">
+                    <img src="<?= htmlspecialchars($row['image']); ?>" alt="<?= htmlspecialchars($row['name']); ?>">
                 </div>
 
                 <div class="review-content">

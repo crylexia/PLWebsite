@@ -43,23 +43,24 @@ if (isset($_POST["add_product"])) {
         $msg     = "Invalid image type. Only JPG, PNG, and WebP are allowed.";
         $msgType = "error";
     } else {
-        // Safe filename: timestamp + sanitized original
         $safeBase  = preg_replace('/[^a-zA-Z0-9_-]/', '_', pathinfo($origName, PATHINFO_FILENAME));
-        $imageName = time() . '_' . $safeBase . '.' . $ext;
-        $dest      = "../assets/css/uploads/" . $imageName;
+        $publicId  = time() . '_' . $safeBase;
 
-        if (move_uploaded_file($tmp, $dest)) {
+        include_once "../config/cloudinary.php";
+        $imageUrl = uploadToCloudinary($tmp, $publicId);
+
+        if (!$imageUrl) {
+            $msg     = "Image upload failed. Check Cloudinary credentials.";
+            $msgType = "error";
+        } else {
             $stmt = $conn->prepare(
                 "INSERT INTO products (name, description, price, image, category, stock)
                  VALUES (?, ?, ?, ?, ?, ?)"
             );
-            $stmt->bind_param("ssdssi", $name, $desc, $price, $imageName, $category, $stock);
+            $stmt->bind_param("ssdssi", $name, $desc, $price, $imageUrl, $category, $stock);
             $stmt->execute();
             $stmt->close();
             $msg = "Product added successfully!";
-        } else {
-            $msg     = "Image upload failed. Check folder permissions.";
-            $msgType = "error";
         }
     }
 }
@@ -476,9 +477,9 @@ button{
             <div class="product-grid">
             <?php foreach($products as $p): ?>
                 <div class="product-card">
-                    <?php $img = (!empty($p["image"])) ? $p["image"] : "placeholder.png"; ?>
+                    <?php $img = (!empty($p["image"])) ? $p["image"] : "../assets/css/uploads/placeholder.png"; ?>
 
-                    <img src="../assets/css/uploads/<?= \htmlspecialchars($img) ?>"
+                    <img src="<?= \htmlspecialchars($img) ?>"
                         alt="<?= \htmlspecialchars($p["name"]) ?>">
 
                     <p class="product-category"><?= \htmlspecialchars($p["category"]) ?></p>

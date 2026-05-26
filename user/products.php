@@ -488,7 +488,7 @@ if ($result) {
         <div class="product-card">
 
             <div class="image-wrap">
-                <img src="../assets/css/uploads/<?= htmlspecialchars($img) ?>"
+               <img src="<?= htmlspecialchars($p['image']) ?>" 
                     style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
 
                 <!-- Favorite Heart Button -->
